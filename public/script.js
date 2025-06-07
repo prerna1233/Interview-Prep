@@ -42,7 +42,7 @@ document.getElementById("generate").addEventListener("click", async () => {
   if (!resumeText) return alert("Please upload or enter a resume.");
 
   try {
-    const response = await fetch("http://localhost:3000/generate-questions", {
+    const response = await fetch("https://interview-prep-ydk4.onrender.com/generate-questions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resume: resumeText }),
