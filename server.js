@@ -1,15 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -37,41 +25,85 @@ app.post('/generate-questions', async (req, res) => {
 
   try {
     const model = genAI.getGenerativeModel({ model: 'models/gemini-2.0-flash' });
-    // const prompt = `You are an expert interviewer. Generate structured interview questions based on this resume:\n\n${resume}`;
- const prompt = `
+    
+
+const prompt = `
 You are an expert interviewer.
 
 Task:
-Generate an interview script based on the candidate's resume provided below. The script should:
-1. Start with a brief friendly **introduction and welcome**.
-2. Ask **technical questions** one by one based on the resume's skills, technologies, and projects.
-3. Then move to **soft skill questions** such as communication, problem-solving, adaptability, teamwork, etc.
-4. After **each question**, mention clearly: "⏺️ Please record your answer now before proceeding."
-5. After the final question, say: "✅ Thank you! Your answers will now be evaluated."
+Read the candidate's resume below. Generate a list of **interview questions only** (no instructions or introductions).
 
-After all responses are received, the system will evaluate the answers and:
-- Give a **score out of 10**.
-- Provide **constructive feedback** highlighting strengths and improvement areas.
+Instructions:
+- ONLY provide interview questions. Each question must be a complete sentence and end with a question mark (?).
+- DO NOT include any greetings, introductions, or closing statements.
+- DO NOT include sentences like "Please record your answer" or "Good luck".
+- ONLY return direct **interview questions**.
 
-Candidate Resume:
-=================
+- Questions should be divided into:
+   🔧 Technical Questions (based on skills/projects)
+   💬 Soft Skill Questions (communication, teamwork, etc.)
+
+Return format (use exactly this):
+---
+Technical Questions:
+1. ...
+2. ...
+...
+
+Soft Skill Questions:
+1. ...
+2. ...
+...
+
+Resume:
+========================
 ${resume}
 `;
+
+
 
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = await response.text();
-    const questions = text
-      .split('\n')
-      .map(q => q.replace(/^\d+\.\s*/, '').trim())
-      .filter(q => q);
-    res.json({ questions });
+   const questions = text
+  .split('\n')
+  .map(line => line.trim())
+  .filter(line => {
+    const lower = line.toLowerCase();
+    return (
+      line.length > 10 &&
+      line.endsWith('?') &&
+      !lower.includes("please record") &&
+      !lower.includes("record your answer") &&
+      !lower.includes("thank you") &&
+      !lower.includes("good luck") &&
+      !lower.includes("✅") &&
+      !lower.includes("⏺️") &&
+      !lower.includes("your answers will be evaluated") &&
+      !lower.startsWith("introduction") &&
+      !lower.startsWith("q:") &&
+      !lower.startsWith("a:") &&
+      !lower.startsWith("okay") &&
+      !lower.includes("interview script") &&
+      !lower.includes("before proceeding")
+    );
+  })
+  .map(q => q.replace(/^(\d+[\.\)]|\-|\*|\–)\s*/, '').trim())
+  .filter(q => q.length > 0);
+console.log("Filtered questions:\n", questions);
+console.log("Filtered questions:", questions);
+res.json({ questions });
+
+
+
   } catch (err) {
     console.error('Error generating questions:', err);
     res.status(500).json({ error: 'Error generating questions' });
   }
 });
+
+// ...existing code...
 
 app.post('/evaluate-answers', async (req, res) => {
   const { answers } = req.body;
@@ -83,21 +115,38 @@ app.post('/evaluate-answers', async (req, res) => {
   try {
     const formattedAnswers = answers.map((a, i) => `${i + 1}. Q: ${a.question}\nA: ${a.answer}`).join('\n\n');
     const model = genAI.getGenerativeModel({ model: "models/gemini-2.0-flash" });
-    const prompt = `Evaluate the following interview answers and give a score out of 10 with feedback:\n\n${formattedAnswers}`;
-    // const result = await model.generateContent(prompt);
-    // const response = await result.response;
 
-const result = await model.generateContent(prompt);
-const response = await result.response;
-const text = await response.text();
-const lines = text.split('\n');
+    const prompt = `
+You are a strict technical interviewer evaluating a candidate's answers.
 
+Instructions:
+- For each answer, give a score out of 10.
+- If the answer is blank, missing, or completely irrelevant, give a score of 0 or 1.
+- If the answer is partially correct or incomplete, give a score between 2 and 6.
+- Only give a high score (7-10) for complete, relevant, and well-explained answers.
+- After scoring, provide specific, constructive feedback for each answer, mentioning what was good and what needs improvement.
+- Be honest and do not inflate scores.
 
+Format your response as:
+Score: <number out of 10>
+Feedback: <your feedback here>
 
-// res.json({ questions });
+Candidate's answers:
+${formattedAnswers}
+`;
 
-    const feedback = await response.text();
-    res.json({ score: 8, feedback });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = await response.text();
+
+    // Try to extract score from the LLM response
+    const scoreMatch = text.match(/Score:\s*(\d+)/i);
+    const score = scoreMatch ? parseInt(scoreMatch[1], 10) : null;
+
+    res.json({
+      score: score !== null ? score : 0,
+      feedback: text
+    });
   } catch (err) {
     console.error('Error evaluating answers:', err);
     res.status(500).json({ error: 'Error evaluating answers' });
