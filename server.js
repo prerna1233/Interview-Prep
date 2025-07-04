@@ -25,7 +25,26 @@ app.post('/generate-questions', async (req, res) => {
 
   try {
     const model = genAI.getGenerativeModel({ model: 'models/gemini-2.0-flash' });
-    
+    // const prompt = `You are an expert interviewer. Generate structured interview questions based on this resume:\n\n${resume}`;
+//  const prompt = `
+// You are an expert interviewer.
+
+// Task:
+// Generate an interview script based on the candidate's resume provided below. The script should:
+//  Start with a brief friendly **introduction and welcome**.
+// 2. Ask **technical questions** one by one based on the resume's skills, technologies, and projects.
+// 3. Then move to **soft skill questions** such as communication, problem-solving, adaptability, teamwork, etc.
+// 4. After **each question**, mention clearly: "⏺️ Please record your answer now before proceeding."
+// 5. After the final question, say: "✅ Thank you! Your answers will now be evaluated."
+
+// After all responses are received, the system will evaluate the answers and:
+// - Give a **score out of 10**.
+// - Provide **constructive feedback** highlighting strengths and improvement areas.
+
+// Candidate Resume:
+// =================
+// ${resume}
+// `;
 
 const prompt = `
 You are an expert interviewer.
@@ -61,7 +80,7 @@ ${resume}
 `;
 
 
-
+await new Promise(resolve => setTimeout(resolve, 3000));
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
