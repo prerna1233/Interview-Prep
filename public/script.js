@@ -37,9 +37,34 @@ document.getElementById('resumeFile').addEventListener('change', async function 
 });
 
 // Generate questions
+// document.getElementById("generate").addEventListener("click", async () => {
+//   const resumeText = document.getElementById("resume").value.trim();
+//   if (!resumeText) return alert("Please upload or enter a resume.");
+
+//   try {
+//     const response = await fetch("https://interview-prep-ydk4.onrender.com/generate-questions", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ resume: resumeText }),
+//     });
+
+//     if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+//     const data = await response.json();
+//     questions = data.questions;
+//     currentIndex = 0;
+//     answers = [];
+//     showQuestion();
+//   } catch (error) {
+//     alert("Error fetching questions: " + error.message);
+//   }
+// });
+
 document.getElementById("generate").addEventListener("click", async () => {
   const resumeText = document.getElementById("resume").value.trim();
   if (!resumeText) return alert("Please upload or enter a resume.");
+
+  showLoading(true); // ✅ Show loading spinner
 
   try {
     const response = await fetch("https://interview-prep-ydk4.onrender.com/generate-questions", {
@@ -57,8 +82,20 @@ document.getElementById("generate").addEventListener("click", async () => {
     showQuestion();
   } catch (error) {
     alert("Error fetching questions: " + error.message);
+  } finally {
+    showLoading(false); // ✅ Hide loading spinner
   }
 });
+
+function showLoading(show) {
+  const overlay = document.getElementById('loadingOverlay');
+  if (show) {
+    overlay.classList.remove('hidden');
+  } else {
+    overlay.classList.add('hidden');
+  }
+}
+
 
 function showQuestion() {
   // Skip empty or too short questions
@@ -163,3 +200,8 @@ document.getElementById("submitAnswers").addEventListener("click", async () => {
     alert("Error submitting answers: " + error.message);
   }
 });
+
+
+
+
+
