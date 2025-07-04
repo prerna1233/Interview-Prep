@@ -1,6 +1,5 @@
 
 
-
   <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,35 +17,31 @@
   </style>
 </head>
 <body>
-  <h1>Interview Question Generator & Evaluator</h1>
-
-  <label>Upload your resume (PDF only):</label><br />
-  <input type="file" id="resumeFile" accept="application/pdf" /><br />
-
-  <textarea id="resume" placeholder="Extracted resume text will appear here..." class="hidden"></textarea><br />
-
-  <button id="generate">Generate Interview Questions</button>
-
-<div id="questionBox" class="hidden">
-  <div id="question"></div>
-  <button id="startRecord">Start Recording Answer</button>
-  <button id="stopRecord" class="hidden">Stop Recording</button>
-  <audio id="recordedAudio" controls class="hidden" style="margin-top: 10px;"></audio>
-  <button id="nextQuestion" class="hidden">Next Question</button>
+<div id="loadingOverlay" class="hidden">
+  <div class="spinner"></div>
 </div>
 
-<button id="submitAnswers" class="hidden">Submit Answers for Evaluation</button>
-<div id="feedbackBox" class="hidden">
-  <pre id="feedback"></pre>
-</div>
-
-  
+  <div class="main-container">
+    <h1>Interview Question Generator & Evaluator</h1>
+    <label>Upload your resume (PDF only):</label><br />
+    <input type="file" id="resumeFile" accept="application/pdf" /><br />
+    <textarea id="resume" class="hidden"></textarea><br />
+    <button id="generate">Generate Interview Questions</button>
+    <div id="questionBox" class="hidden">
+      <div id="question"></div>
+      <button id="startRecord">Start Recording Answer</button>
+      <button id="stopRecord" class="hidden">Stop Recording</button>
+      <audio id="recordedAudio" controls class="hidden" style="margin-top: 10px;"></audio>
+      <button id="nextQuestion" class="hidden">Next Question</button>
+    </div>
+    <button id="submitAnswers" class="hidden">Submit Answers for Evaluation</button>
+    <div id="feedbackBox" class="hidden">
+      <div style="font-weight:600; color:#2471a3; margin-bottom:8px; font-size:1.1em;">AI Feedback</div>
+      <div id="feedback"></div>
+    </div>
+  </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-  <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-  </script>
-
-<script type="module" src="public/script.js"></script>
+  <script src="public/script.js"></script>
 </body>
 </html> 
 
@@ -55,6 +50,9 @@
 
 
 
+
+
+ 
 
 
 
