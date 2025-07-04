@@ -1,4 +1,4 @@
-/* Base Reset & Fonts */
+Base Reset & Fonts
 * {
   box-sizing: border-box;
   margin: 0;
@@ -17,7 +17,6 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Heading */
 h1 {
   text-align: center;
   color: #2c3e50;
@@ -26,7 +25,7 @@ h1 {
   font-size: 2rem;
 }
 
-/* Labels & Inputs */
+
 label {
   display: block;
   font-weight: 600;
@@ -47,7 +46,7 @@ input[type="file"]:focus {
   outline: none;
 }
 
-/* Textarea */
+
 textarea {
   width: 100%;
   min-height: 150px;
@@ -65,7 +64,7 @@ textarea:focus {
   outline: none;
 }
 
-/* Button */
+
 button {
   background-color: #3498db;
   color: white;
@@ -89,7 +88,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Question Box */
+
 #question {
   font-weight: bold;
   font-size: 1.2rem;
@@ -102,7 +101,7 @@ button:disabled {
   word-wrap: break-word;
 }
 
-/* Feedback Box */
+
 #feedbackBox {
   white-space: pre-wrap;
   background: #f9f9f9;
@@ -118,7 +117,7 @@ button:disabled {
   box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
-/* Audio */
+
 audio {
   margin-top: 15px;
   width: 100%;
@@ -126,12 +125,12 @@ audio {
   outline: none;
 }
 
-/* Hide class */
+
 .hidden {
   display: none !important;
 }
 
-/* MEDIA QUERIES */
+
 @media (max-width: 768px) {
   body {
     padding: 15px;
@@ -181,3 +180,25 @@ audio {
     padding: 10px;
   }
 }
+
+ body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
+    textarea { width: 100%; height: 150px; margin-top: 10px; }
+    .hidden { display: none; }
+    button { margin: 10px 0; padding: 10px 15px; }
+    #question { font-weight: bold; margin-top: 20px; }
+    #feedbackBox { 
+      white-space: pre-wrap; 
+      background: #eee; 
+      padding: 15px; 
+      margin-top: 20px; 
+      border-radius: 8px;
+      word-break: break-word;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+    #feedback {
+      white-space: pre-line;
+      word-break: break-word;
+      font-family: inherit;
+    }
+ 
