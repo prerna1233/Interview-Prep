@@ -30,30 +30,6 @@ document.getElementById('resumeFile').addEventListener('change', async function 
   }
 });
 
-// Generate questions
-// document.getElementById("generate").addEventListener("click", async () => {
-//   const resumeText = document.getElementById("resume").value.trim();
-//   if (!resumeText) return alert("Please upload or enter a resume.");
-
-//   try {
-//     const response = await fetch("https://interview-prep-ydk4.onrender.com/generate-questions", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ resume: resumeText }),
-//     });
-
-//     if (!response.ok) throw new Error(`Server error: ${response.status}`);
-
-//     const data = await response.json();
-//     questions = data.questions;
-//     currentIndex = 0;
-//     answers = [];
-//     showQuestion();
-//   } catch (error) {
-//     alert("Error fetching questions: " + error.message);
-//   }
-// });
-
 document.getElementById("generate").addEventListener("click", async () => {
   const resumeText = document.getElementById("resume").value.trim();
   const numQuestions = parseInt(document.getElementById("numQuestions").value, 10) || 10;
