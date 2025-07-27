@@ -38,7 +38,7 @@ document.getElementById("generate").addEventListener("click", async () => {
   showLoading(true);
 
   try {
-    const response = await fetch("https://interview-prep-ydk4.onrender.com/generate-questions", {
+    const response = await fetch("https://interview-prep-3-9lbw.onrender.com", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resume: resumeText, numQuestions }),
@@ -191,7 +191,7 @@ document.getElementById("submitAnswers").addEventListener("click", async () => {
   feedbackSpinner.classList.remove("hidden");
   feedbackDiv.textContent = "";
   try {
-    const response = await fetch("http://localhost:3000/evaluate-answers", {
+    const response = await fetch("https://interview-prep-3-9lbw.onrender.com", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ answers }),
