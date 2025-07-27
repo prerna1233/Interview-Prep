@@ -1,4 +1,4 @@
-// public/questions.js
+
 
 const allQuestions = JSON.parse(localStorage.getItem("questions") || "[]");
 
