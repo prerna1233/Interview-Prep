@@ -38,7 +38,7 @@ document.getElementById("generate").addEventListener("click", async () => {
   showLoading(true);
 
   try {
-    const response = await fetch("https://interview-prep-3-9lbw.onrender.com", {
+    const response = await fetch("https://interview-prep-3-9lbw.onrender.com/generate-questions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resume: resumeText, numQuestions }),
@@ -134,11 +134,15 @@ document.getElementById("startRecord").addEventListener("click", async () => {
 
     recognition.onresult = function (event) {
       const transcript = event.results[0][0].transcript;
-      answers.push({
+      // Update the answer for the current question (not push, but set by index)
+      answers[currentIndex] = {
         question: questions[currentIndex],
         answer: transcript,
         audio: audioUrl // Optional: store audio URL
-      });
+      };
+      document.getElementById("submitTextAnswer").style.display = "none";
+      document.getElementById("textAnswer").value = "Submitted";
+      document.getElementById("textAnswer").disabled = true;
     };
 
     recognition.onerror = e => alert("Speech recognition error: " + e.error);
@@ -191,7 +195,7 @@ document.getElementById("submitAnswers").addEventListener("click", async () => {
   feedbackSpinner.classList.remove("hidden");
   feedbackDiv.textContent = "";
   try {
-    const response = await fetch("https://interview-prep-3-9lbw.onrender.com", {
+    const response = await fetch("https://interview-prep-3-9lbw.onrender.com/evaluate-answers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ answers }),
