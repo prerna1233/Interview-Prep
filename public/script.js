@@ -1,9 +1,3 @@
-
-
-
-
-
-
 // Add pdf.js worker setting at top
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
@@ -62,28 +56,29 @@ document.getElementById('resumeFile').addEventListener('change', async function 
 
 document.getElementById("generate").addEventListener("click", async () => {
   const resumeText = document.getElementById("resume").value.trim();
+  const numQuestions = parseInt(document.getElementById("numQuestions").value, 10) || 10;
   if (!resumeText) return alert("Please upload or enter a resume.");
 
-  showLoading(true); // ✅ Show loading spinner
+  showLoading(true);
 
   try {
     const response = await fetch("https://interview-prep-ydk4.onrender.com/generate-questions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ resume: resumeText }),
+      body: JSON.stringify({ resume: resumeText, numQuestions }),
     });
 
     if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
     const data = await response.json();
-    questions = data.questions;
+    questions = data.questions.slice(0, numQuestions); // Only use the requested number
     currentIndex = 0;
     answers = [];
     showQuestion();
   } catch (error) {
     alert("Error fetching questions: " + error.message);
   } finally {
-    showLoading(false); // ✅ Hide loading spinner
+    showLoading(false);
   }
 });
 
@@ -111,15 +106,25 @@ function showQuestion() {
 
   document.getElementById("questionBox").classList.remove("hidden");
   document.getElementById("question").textContent = `Q${currentIndex + 1}: ${questions[currentIndex]}`;
-  
-  // Always show the Next Question button to allow skipping
   document.getElementById("nextQuestion").classList.remove("hidden");
-
-  // Hide previous audio and reset record controls
   document.getElementById("recordedAudio").classList.add("hidden");
   document.getElementById("recordedAudio").src = "";
   document.getElementById("startRecord").classList.remove("hidden");
   document.getElementById("stopRecord").classList.add("hidden");
+
+  // Clear text answer input
+  const textAnswerInput = document.getElementById("textAnswer");
+  textAnswerInput.value = "";
+
+  // Hide submit button if already answered
+  if (answers[currentIndex]) {
+    document.getElementById("submitTextAnswer").style.display = "none";
+    textAnswerInput.disabled = true;
+    textAnswerInput.value = "Submitted";
+  } else {
+    document.getElementById("submitTextAnswer").style.display = "inline-block";
+    textAnswerInput.disabled = false;
+  }
 }
 
 
@@ -182,8 +187,33 @@ document.getElementById("nextQuestion").addEventListener("click", () => {
   showQuestion();
 });
 
+// Text answer submission
+const textAnswerInput = document.getElementById("textAnswer");
+document.getElementById("submitTextAnswer").addEventListener("click", () => {
+  const text = textAnswerInput.value.trim();
+  if (!text) {
+    alert("Please type your answer before submitting.");
+    return;
+  }
+  answers[currentIndex] = {
+    question: questions[currentIndex],
+    answer: text,
+    audio: null
+  };
+  textAnswerInput.value = "Submitted";
+  textAnswerInput.disabled = true;
+  document.getElementById("submitTextAnswer").style.display = "none";
+  document.getElementById("nextQuestion").classList.remove("hidden");
+});
+
 // Submit answers
 document.getElementById("submitAnswers").addEventListener("click", async () => {
+  const feedbackSpinner = document.getElementById("feedback-spinner");
+  const feedbackBox = document.getElementById("feedbackBox");
+  const feedbackDiv = document.getElementById("feedback");
+  feedbackBox.classList.remove("hidden");
+  feedbackSpinner.classList.remove("hidden");
+  feedbackDiv.textContent = "";
   try {
     const response = await fetch("http://localhost:3000/evaluate-answers", {
       method: "POST",
@@ -194,10 +224,11 @@ document.getElementById("submitAnswers").addEventListener("click", async () => {
     if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
     const data = await response.json();
-    document.getElementById("feedback").textContent = `Score: ${data.score}/10\n\nFeedback:\n${data.feedback}`;
-    document.getElementById("feedbackBox").classList.remove("hidden");
+    feedbackDiv.textContent = `Score: ${data.score}/10\n\nFeedback:\n${data.feedback}`;
   } catch (error) {
-    alert("Error submitting answers: " + error.message);
+    feedbackDiv.textContent = "Error submitting answers: " + error.message;
+  } finally {
+    feedbackSpinner.classList.add("hidden");
   }
 });
 
